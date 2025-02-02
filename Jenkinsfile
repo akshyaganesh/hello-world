@@ -9,13 +9,13 @@ pipeline{
                 // git 'https://github.com/akshyaganesh/hello-world.git'
                 checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/akshyaganesh/hello-world.git']])
             }
-         }        
+       }        
        stage('Build'){
             steps{
                 sh 'mvn clean package'
             }
-         }
-        stage('SonarQube analysis') {
+       }
+       stage('SonarQube analysis') {
             //    def scannerHome = tool 'SonarScanner 4.0';
             steps{
                 withSonarQubeEnv('sonarqube-8.0') { 
@@ -24,29 +24,26 @@ pipeline{
                 sh "mvn sonar:sonar"
                 }
             }
-         }
-        stage('Build docker image'){
+       }
+       stage('Build docker image'){
             steps{
                 script{
                     sh 'docker build -t hello-world .'
                 }
             }
-        }
-        stage('Push image to Hub'){
+       }
+        '''
+       stage('Push image to Hub'){
             steps{
                 script{
-                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                   withCredentials([string(credentialsId: 'github', variable: 'dockerhubpwd')]) {
                    sh 'docker login -u akshyaganesh -p ${dockerhubpwd}'
-
+        
                     }
                    //sh 'docker push akshyaganesh/hello-world'
                     sh 'docker push hello-world'
                 }
             }
-         }
-        
-            
-        
-       
+       } '''
     }
 }
